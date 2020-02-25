@@ -1,23 +1,27 @@
-package com.patiyal.remindme
+package com.patiyal.remindme.ui.dashboard
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-
+import androidx.appcompat.app.AppCompatActivity
+import com.patiyal.remindme.R
+import com.patiyal.remindme.dummy.DummyContent
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class TaskDashboardActivity : AppCompatActivity(),
+    TaskFragment.OnListFragmentInteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        supportFragmentManager.beginTransaction()
+            .add(
+                R.id.task_list_container,
+                TaskFragment.newInstance(1)
+            ).commit()
+        fab.setOnClickListener {
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
         }
     }
 
@@ -35,5 +39,9 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onListFragmentInteraction(item: DummyContent.DummyItem?) {
+
     }
 }
