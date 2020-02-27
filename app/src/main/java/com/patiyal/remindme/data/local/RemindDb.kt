@@ -1,9 +1,8 @@
 package com.patiyal.remindme.data.local
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.patiyal.remindme.data.local.dao.TaskDao
 import com.patiyal.remindme.data.model.Task
@@ -13,27 +12,19 @@ import com.patiyal.remindme.data.model.Task
 abstract class RemindDb : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 
+    companion object {
+        @Volatile
+        private var instance: RemindDb? = null
+        private val LOCK = Any()
 
-    private var sInstance: RemindDb? = null
-
-    @VisibleForTesting
-    val DATABASE_NAME = "basic-sample-db"
-
-
-    private val mIsDatabaseCreated =
-        MutableLiveData<Boolean>()
-
-
-    /**
-     * Check whether the database already exists and expose it via [.getDatabaseCreated]
-     */
-    open fun updateDatabaseCreated(context: Context) {
-        if (context.getDatabasePath(DATABASE_NAME).exists()) {
-            setDatabaseCreated()
+        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
+            instance ?: buildDatabase(context).also { instance = it }
         }
-    }
 
-    open fun setDatabaseCreated() {
-        mIsDatabaseCreated.postValue(true)
+        private fun buildDatabase(context: Context) = Room.databaseBuilder(
+            context,
+            RemindDb::class.java, "todo-list.db"
+        )
+            .build()
     }
 }
